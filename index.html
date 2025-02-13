@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Калькулятор Индекса Климатического Комфорта</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: auto;
+            padding: 20px;
+            text-align: center;
+        }
+        select, input, button {
+            margin: 10px;
+            padding: 8px;
+            width: 90%;
+        }
+        .result {
+            font-size: 1.5em;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Калькулятор Индекса Климатического Комфорта</h1>
+
+    <label for="city">Выберите город:</label>
+    <select id="city">
+        {% for city in cities %}
+            <option value="{{ city }}">{{ city }}</option>
+        {% endfor %}
+    </select>
+
+    <h3>Настройки комфортных условий</h3>
+
+    <label>Оптимальная температура (°C):</label>
+    <input type="number" id="opt_temp" value="22">
+
+    <label>Оптимальная влажность (%):</label>
+    <input type="number" id="opt_humidity" value="50">
+
+    <label>Оптимальная скорость ветра (м/с):</label>
+    <input type="number" id="opt_wind" value="2">
+
+    <label>Оптимальное количество осадков (мм):</label>
+    <input type="number" id="opt_rain" value="700">
+
+    <label>Оптимальное количество солнечных дней:</label>
+    <input type="number" id="opt_sun" value="200">
+
+    <button onclick="calculateComfort()">Рассчитать индекс комфорта</button>
+
+    <div class="result" id="result"></div>
+
+    <script>
+        function calculateComfort() {
+            var city = $("#city").val();
+            var opt_temp = parseFloat($("#opt_temp").val());
+            var opt_humidity = parseFloat($("#opt_humidity").val());
+            var opt_wind = parseFloat($("#opt_wind").val());
+            var opt_rain = parseFloat($("#opt_rain").val());
+            var opt_sun = parseFloat($("#opt_sun").val());
+
+            $.ajax({
+                url: "/calculate",
+                type: "POST",
+                contentType: "application/json",
+                data: JSON.stringify({
+                    city: city,
+                    opt_temp: opt_temp,
+                    opt_humidity: opt_humidity,
+                    opt_wind: opt_wind,
+                    opt_rain: opt_rain,
+                    opt_sun: opt_sun
+                }),
+                success: function(response) {
+                    $("#result").html("Индекс климатического комфорта: " + response.index + " из 100");
+                },
+                error: function() {
+                    $("#result").html("Ошибка при расчете индекса.");
+                }
+            });
+        }
+    </script>
+
+</body>
+</html>
